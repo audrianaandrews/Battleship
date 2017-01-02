@@ -160,7 +160,7 @@ class Battleship(object):
         if player_board.done == True:
             self.clear_screen()
             player_board.display_board()
-            print(player + "Wins!")
+            print(player + " Wins!")
             other_board.turn_over = False
             other_board.done == True
         else:
