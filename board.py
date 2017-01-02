@@ -12,6 +12,7 @@ class Board(object):
 
         self.board_size = board_size
         self.whole_board = {}
+        self.backup_board = {}
         self.done = False
         self.player_ships = {}
         self.shots_taken = {}
@@ -152,7 +153,7 @@ class Board(object):
             column = int(column)
             row = int(row)
             if self.shots_taken[row][column] != self.square_size:
-                print "You've already attacked this spot."
+                print("You've already attacked this spot.")
                 raise Exception
             user_entry = (row, column)
             ships = other_player.player_ships.keys()
@@ -168,9 +169,9 @@ class Board(object):
                             del other_player.player_ships[ship]
                             ships_left = len(other_player.player_ships.keys())
                             if ships_left > 0:
-                                print player + " has sunk a ship, only", \
-                                  ships_left, "to go!"
-                                print "\n"
+                                print(player + " has sunk a ship, only", \
+                                  ships_left, "to go!")
+                                print("\n")
                             if other_player.player_ships == {}:
                                 self.done = True
                         return
@@ -179,7 +180,7 @@ class Board(object):
             return
         except Exception:
             try:
-                row, column = raw_input("Please enter valid coordinates: ").\
+                row, column = input("Please enter valid coordinates: ").\
                     split()
                 self.check_if_hit(row, column, other_player, player)
             except Exception:

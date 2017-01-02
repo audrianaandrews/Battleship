@@ -4,7 +4,7 @@ import random
 import time
 from board import Board
 from computerAI import ComputerAI
-
+import copy
 
 class Battleship(object):
     '''Game of Battleship.'''
@@ -21,24 +21,24 @@ class Battleship(object):
         self.board2 = None
 
     def play(self):
-        print "Welcome to Battleship\n"
+        print("Welcome to Battleship\n")
 
         self.want_instructions()
         self.clear_screen()
 
-        print "Welcome to Battleship\n"
+        print("Welcome to Battleship\n")
 
-        print "These are the game modes available:\n"
-        print "h: for Human vs Human \nc: for Easy Computer vs Human"
-        print "a: for Hard Computer vs Human"
+        print("These are the game modes available:\n")
+        print("h: for Human vs Human \nc: for Easy Computer vs Human")
+        print("a: for Hard Computer vs Human")
         self.choose_mode()
 
         self.choose_board_size()
-        print "\n"
+        print("\n")
 
-        print "These are the ships available:\n"
+        print("These are the ships available:\n")
         self.print_ships_available()
-        print "\n"
+        print("\n")
 
         while self.fits_ships == False:
             self.board1.aircraft = self.num_of_ships("aircraft carriers")
@@ -56,16 +56,16 @@ class Battleship(object):
             if self.board1.aircraft == 0 and self.board2.submarine == 0 and \
                self.board2.patrol == 0\
                and self.board2.battleship == 0:
-                print "You must enter at least one for one of the type of",
-                print "ships."
-                print "\n"
+                print("You must enter at least one for one of the type of",)
+                print("ships.")
+                print("\n")
             else:
                 self.place_ships(self.board1)
                 self.place_ships(self.board2)
 
                 if self.fits_ships == False:
-                    print "The board can't fit your ships.",
-                    print "Please choose a different amount.\n"
+                    print("The board can't fit your ships.",)
+                    print("Please choose a different amount.\n")
 
         if self.mode == "h":
             while self.board1.done == False and self.board2.done == False:
@@ -94,7 +94,7 @@ class Battleship(object):
                     if self.board2.done == True:
                         self.clear_screen()
                         self.board2.display_board()
-                        print "The computer won..."
+                        print("The computer won...")
                         self.board1.turn_over = False
                         self.board1.done == True
                     else:
@@ -112,7 +112,7 @@ class Battleship(object):
                     if self.board2.done == True:
                         self.clear_screen()
                         self.board2.display_board()
-                        print "The computer won..."
+                        print("The computer won...")
                         self.board1.turn_over = False
                         self.board1.done == True
                     else:
@@ -126,14 +126,14 @@ class Battleship(object):
 
         try:
             instruct = \
-                raw_input("Would you like to see the instructions(y or n)? ")
-            print "\n"
+                input("Would you like to see the instructions(y or n)? ")
+            print("\n")
             if instruct == "y" or instruct == "n":
                 if instruct == "y":
                     instructions = open("instructions.txt")
                     for line in instructions:
-                        print line,
-                    raw_input("\n\nPress Enter to continue.")
+                        print(line,)
+                    input("\n\nPress Enter to continue.")
                 else:
                     pass
             else:
@@ -146,21 +146,21 @@ class Battleship(object):
         Take user's input, input into Board dictionaries and display updated
         game board to screen. Then check to see if player has won.'''
 
-        print "%s's board:\n" % (player)
+        print("Enemy's board | %s's board:\n" % (player))
         player_board.display_board()
         try:
-            row, column = raw_input("Please enter coordinates:").split()
+            row, column = input("Please enter coordinates (y x):").split()
             player_board.check_if_hit(row, column, other_board, player)
         except Exception:
             player_board.check_if_hit('b', 'a', player_board, player)
         self.clear_screen()
-        print "%s's board:\n" % (player)
+        print("Enemy's board | %s's board\n" % (player))
         player_board.display_board()
 
         if player_board.done == True:
             self.clear_screen()
             player_board.display_board()
-            print player + "Wins!"
+            print(player + "Wins!")
             other_board.turn_over = False
             other_board.done == True
         else:
@@ -173,7 +173,7 @@ class Battleship(object):
         Take user's input to decide which version of game to play.'''
 
         try:
-            self.mode = raw_input("Please choose a mode to play: ")
+            self.mode = input("Please choose a mode to play: ")
             if self.mode == "h" or self.mode == "c" or self.mode == "a":
                 pass
             else:
@@ -187,7 +187,7 @@ class Battleship(object):
 
         try:
             self.board_size = \
-                int(raw_input("\nPlease enter the size of board: "))
+                int(input("\nPlease enter the size of board: "))
             if self.board_size < 2 or \
                (isinstance(self.board_size, int) == False):
                 raise Exception
@@ -197,7 +197,7 @@ class Battleship(object):
                 self.board2 = Board(self.board_size)
                 self.board2.create_board()
         except Exception:
-                print "Please enter a number greater than 1."
+                print("Please enter a number greater than 1.")
                 self.choose_board_size()
 
     def print_ships_available(self):
@@ -223,13 +223,13 @@ class Battleship(object):
         ship the user will have.'''
 
         try:
-            amount = raw_input("Please enter the amount of %s you'd like: " \
+            amount = input("Please enter the amount of %s you'd like: " \
                                % (ship_type))
             amount = int(amount)
             amount += 0
             return amount
         except Exception:
-            print "Please enter a number."
+            print("Please enter a number.")
             amount = self.num_of_ships(ship_type)
             return amount
 
@@ -237,6 +237,7 @@ class Battleship(object):
         '''(Battlefield, Board) -> None
         Randomly assign player ships.'''
 
+        board.backup_board = copy.deepcopy(board.whole_board)
         sys.setrecursionlimit(1000)
         try:
             for ship in range(board.aircraft):
@@ -252,12 +253,13 @@ class Battleship(object):
                 board.place_ships(2)
             self.fits_ships = True
         except RuntimeError:
+            board.whole_board = copy.deepcopy(board.backup_board)
             self.fits_ships = False
 
     def clear_screen(self):
         '''Clear python screen.'''
 
-        print "\n"
+        print("\n")
         time.sleep(1.5)
         if os.name == "posix":
         # Unix/Linux/MacOS/BSD/etc
@@ -274,13 +276,13 @@ def play_again():
     '''
 
     try:
-        replay = raw_input("Would you like to play again?(y or n): ")
+        replay = input("Would you like to play again?(y or n): ")
         if replay == "y" or replay == "n":
             return replay
         else:
             raise Exception
     except Exception:
-        print "Please enter y or n."
+        print("Please enter y or n.")
         play_again()
         return replay
 
@@ -290,5 +292,5 @@ if __name__ == "__main__":
         battleship = Battleship()
         battleship.clear_screen()
         battleship.play()
-        print "\n"
+        print("\n")
         replay = play_again()
